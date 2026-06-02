@@ -1,9 +1,10 @@
 "use client";
 
 import type { Language, SiteCopy } from "@/lib/site-copy";
-import { ArrowRight } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
+import { ArrowRight, Menu, X } from "lucide-react";
 import type { MouseEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MagneticButton } from "./magnetic-button";
 import { motion, staggerContainer } from "./motion";
 
@@ -22,7 +23,7 @@ function InteractiveLogo() {
         hover: { scale: 1.05, transition: { duration: 0.28, ease: [0.19, 1, 0.22, 1] } },
       }}
       className="group relative inline-flex items-center text-lg font-black tracking-tight sm:text-xl"
-      aria-label="neraboti.bg home"
+      aria-label="Начална страница на neraboti.bg"
     >
       {letters.map((letter, index) => (
         <motion.span
@@ -114,14 +115,17 @@ function InteractiveLogo() {
 function HeaderNav({ copy }: { copy: SiteCopy["nav"] }) {
   const [hovered, setHovered] = useState<string | null>(null);
   const links = [
-    { href: "#services", label: copy.services },
-    { href: "#remote-setup", label: copy.remote },
-    { href: "#booking", label: copy.booking },
-    { href: "#about", label: copy.about },
+    { href: "/uslugi", label: copy.services },
+    { href: "/ceni", label: copy.pricing },
+    { href: "/anydesk-pomosht", label: copy.remote },
+    { href: "/za-nas", label: copy.about },
+    { href: "/kontakti", label: copy.contacts },
+    { href: "/faq", label: copy.faq },
   ];
 
   return (
     <nav
+      aria-label="Основна навигация"
       onMouseLeave={() => setHovered(null)}
       className="hidden items-center gap-1 rounded-full border border-white/5 bg-white/[0.025] p-1 text-sm text-slate-400 md:flex"
     >
@@ -134,7 +138,7 @@ function HeaderNav({ copy }: { copy: SiteCopy["nav"] }) {
             onMouseEnter={() => setHovered(link.href)}
             animate={{ scale: isHovered ? 1.1 : 1 }}
             transition={{ duration: 0.28, ease: [0.19, 1, 0.22, 1] }}
-            className={`relative isolate rounded-full px-4 py-2 transition-colors duration-300 ${
+            className={`relative isolate rounded-full px-4 py-2 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 ${
               isHovered ? "text-cyan-100" : "text-slate-400"
             }`}
           >
@@ -155,6 +159,78 @@ function HeaderNav({ copy }: { copy: SiteCopy["nav"] }) {
   );
 }
 
+function MobileNav({ copy }: { copy: SiteCopy["nav"] }) {
+  const [open, setOpen] = useState(false);
+  const links = [
+    { href: "/uslugi", label: copy.services },
+    { href: "/ceni", label: copy.pricing },
+    { href: "/anydesk-pomosht", label: copy.remote },
+    { href: "/za-nas", label: copy.about },
+    { href: "/kontakti", label: copy.contacts },
+    { href: "/faq", label: copy.faq },
+    { href: "#booking", label: copy.booking, emphasized: true },
+  ];
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
+  return (
+    <div className="relative md:hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={open}
+        aria-controls="mobile-main-nav"
+        aria-label={open ? "Затвори меню" : "Отвори меню"}
+        className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-slate-950/72 text-cyan-100 transition hover:border-cyan-300/45 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950"
+      >
+        {open ? <X aria-hidden="true" className="h-5 w-5" /> : <Menu aria-hidden="true" className="h-5 w-5" />}
+      </button>
+      {open ? (
+        <nav
+          id="mobile-main-nav"
+          aria-label="Основна навигация"
+          className="absolute right-0 top-14 z-50 w-64 rounded-2xl border border-cyan-300/15 bg-slate-950/96 p-3 shadow-[0_24px_80px_rgba(0,0,0,.45)] backdrop-blur-xl"
+        >
+          <div className="grid gap-2">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => {
+                  if (link.href === "#booking") {
+                    trackEvent("cta_click_book", { source: "mobile_nav" });
+                  }
+                  setOpen(false);
+                }}
+                className={`rounded-lg px-4 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 ${
+                  link.emphasized
+                    ? "border border-cyan-300/40 bg-cyan-300/12 text-cyan-50"
+                    : "text-slate-200 hover:bg-white/[0.055] hover:text-cyan-100"
+                }`}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      ) : null}
+    </div>
+  );
+}
+
 function HeaderCta({ children }: { children: ReactNode }) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
@@ -168,6 +244,7 @@ function HeaderCta({ children }: { children: ReactNode }) {
   return (
     <motion.a
       href="#booking"
+      onClick={() => trackEvent("cta_click_book", { source: "header" })}
       onMouseMove={handleMove}
       onMouseLeave={() => setOffset({ x: 0, y: 0 })}
       animate={{ x: offset.x, y: offset.y }}
@@ -177,7 +254,7 @@ function HeaderCta({ children }: { children: ReactNode }) {
       }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 180, damping: 18, mass: 0.45 }}
-      className="group relative hidden h-10 items-center justify-center overflow-hidden rounded-full p-[1px] text-sm font-semibold shadow-[0_0_24px_rgba(0,242,255,.22)] sm:inline-flex"
+      className="group relative hidden h-10 items-center justify-center overflow-hidden rounded-full p-[1px] text-sm font-semibold shadow-[0_0_24px_rgba(0,242,255,.22)] focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 sm:inline-flex"
     >
       <span className="absolute inset-0 animate-border-beam bg-[linear-gradient(90deg,#00f2ff,#34d399,#a855f7,#00f2ff)] bg-[length:200%_100%]" />
       <motion.span
@@ -193,62 +270,13 @@ function HeaderCta({ children }: { children: ReactNode }) {
   );
 }
 
-function LanguageToggle({
-  language,
-  onChange,
-}: {
-  language: Language;
-  onChange: (language: Language) => void;
-}) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.04, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      className="relative flex h-11 items-center rounded-full border border-white/10 bg-slate-950/72 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,.1),inset_0_-22px_34px_rgba(2,6,23,.75),inset_0_0_0_1px_rgba(34,211,238,.06),0_0_30px_rgba(0,242,255,.14)] backdrop-blur-2xl"
-      aria-label="Language switcher"
-      role="group"
-    >
-      {(["BG", "EN"] as const).map((item) => (
-        <button
-          key={item}
-          type="button"
-          onClick={() => onChange(item)}
-          className={`relative isolate h-9 w-12 rounded-full text-xs font-black tracking-[0.16em] transition-colors duration-300 ${
-            language === item
-              ? "text-white drop-shadow-[0_0_12px_rgba(0,242,255,.95)]"
-              : "text-slate-500 hover:text-slate-300"
-          }`}
-          aria-pressed={language === item}
-        >
-          {language === item ? (
-            <motion.span
-              layoutId="active-language-pill"
-              className="absolute inset-0 -z-10 rounded-full border border-[#00f2ff]/55 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,.42),transparent_38%),linear-gradient(135deg,rgba(0,242,255,.3),rgba(52,211,153,.18)_55%,rgba(168,85,247,.16))] shadow-[0_0_30px_rgba(0,242,255,.48),inset_0_0_18px_rgba(0,242,255,.22)]"
-              transition={{
-                type: "spring",
-                stiffness: 620,
-                damping: 34,
-                mass: 0.58,
-                bounce: 0.28,
-                ease: [0.19, 1, 0.22, 1],
-              }}
-            />
-          ) : null}
-          {item}
-        </button>
-      ))}
-    </motion.div>
-  );
-}
-
 export function HeroSection({
   copy,
   language,
-  onLanguageChange,
 }: {
   copy: SiteCopy;
   language: Language;
-  onLanguageChange: (language: Language) => void;
+  onLanguageChange?: (language: Language) => void;
 }) {
   const words = copy.hero.headline.split(" ");
 
@@ -272,7 +300,7 @@ export function HeroSection({
         <InteractiveLogo />
         <div className="flex items-center gap-3 lg:gap-5">
           <HeaderNav copy={copy.nav} />
-          <LanguageToggle language={language} onChange={onLanguageChange} />
+          <MobileNav copy={copy.nav} />
           <HeaderCta>{copy.nav.booking}</HeaderCta>
         </div>
       </header>
@@ -284,7 +312,7 @@ export function HeroSection({
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="max-w-5xl text-5xl font-semibold leading-[1.02] tracking-tight text-white sm:text-6xl lg:text-8xl"
+            className="max-w-5xl text-4xl font-semibold leading-[1.04] tracking-tight text-white sm:text-6xl lg:text-8xl"
           >
             {words.map((word, index) => (
               <motion.span
@@ -307,11 +335,21 @@ export function HeroSection({
           </motion.h1>
 
           <motion.p
+            key={`${language}-hero-line`}
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.34, duration: 0.68, ease: [0.19, 1, 0.22, 1] }}
+            className="mt-5 max-w-4xl text-2xl font-semibold leading-tight text-cyan-100 sm:text-3xl lg:text-4xl"
+          >
+            {copy.hero.heroLine}
+          </motion.p>
+
+          <motion.p
             key={`${language}-subheadline`}
             initial={{ opacity: 0, y: 20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.45, duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
-            className="mt-7 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl"
+            transition={{ delay: 0.52, duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
+            className="mt-5 max-w-3xl text-base leading-8 text-slate-300 sm:text-xl"
           >
             {copy.hero.subheadline}
           </motion.p>
@@ -320,14 +358,34 @@ export function HeroSection({
             initial={{ opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.72, duration: 0.65, ease: [0.19, 1, 0.22, 1] }}
-            className="mt-10 flex flex-col gap-4 sm:flex-row"
+            className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap"
           >
-            <MagneticButton href="#booking">
-              {copy.hero.primaryCta} <ArrowRight className="ml-2 h-4 w-4" />
+            <MagneticButton
+              href="#booking"
+              onClick={() => trackEvent("cta_click_help_now", { source: "hero" })}
+            >
+              {copy.hero.primaryCta} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" />
             </MagneticButton>
-            <MagneticButton href="#services" variant="secondary">
+            <MagneticButton
+              href="#booking"
+              variant="secondary"
+              onClick={() => trackEvent("cta_click_book", { source: "hero" })}
+            >
               {copy.hero.secondaryCta}
             </MagneticButton>
+            <MagneticButton href="#pricing" variant="secondary">
+              {copy.hero.tertiaryCta}
+            </MagneticButton>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.58, ease: [0.19, 1, 0.22, 1] }}
+            className="mt-5 max-w-3xl space-y-2 text-sm leading-6 text-slate-400 sm:text-base"
+          >
+            <p className="text-cyan-100">{copy.hero.urgentLine}</p>
+            <p>{copy.hero.trustLine}</p>
           </motion.div>
         </div>
       </div>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="neraboti.bg">
+  <rect width="128" height="128" rx="24" fill="#020617"/>
+  <path d="M28 82V34h14l36 48V34h16v48H80L44 34v48H28Z" fill="#67e8f9"/>
+  <path d="M24 94h80" stroke="#34d399" stroke-width="8" stroke-linecap="round"/>
+</svg>

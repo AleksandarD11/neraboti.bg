@@ -9,6 +9,22 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -21,9 +37,38 @@ body {
   color: #e2e8f0;
 }
 
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+#booking {
+  scroll-margin-top: 7rem;
+}
+
 ::selection {
   background: rgba(34, 211, 238, 0.28);
   color: white;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  border-radius: 0.5rem;
+  background: #020617;
+  color: #ecfeff;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px #67e8f9, 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: none;
 }
 
 .noise {

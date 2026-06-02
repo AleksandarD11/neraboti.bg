@@ -7,6 +7,7 @@ type SectionShellProps = {
   id?: string;
   eyebrow?: string;
   title: string;
+  titleAs?: "h1" | "h2";
   subtitle?: string;
   children: ReactNode;
 };
@@ -15,9 +16,12 @@ export function SectionShell({
   id,
   eyebrow,
   title,
+  titleAs = "h2",
   subtitle,
   children,
 }: SectionShellProps) {
+  const TitleTag = titleAs;
+
   return (
     <motion.section
       id={id}
@@ -34,9 +38,9 @@ export function SectionShell({
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+        <TitleTag className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
           {title}
-        </h2>
+        </TitleTag>
         {subtitle ? (
           <p className="mt-5 text-base leading-7 text-slate-400 sm:text-lg">
             {subtitle}

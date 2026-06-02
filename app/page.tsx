@@ -1,25 +1,23 @@
-"use client";
+import { HomePage } from "@/components/home-page";
+import { absoluteUrl, getLanguageAlternates } from "@/lib/site-config";
+import type { Metadata } from "next";
 
-import { AnyDeskSection } from "@/components/anydesk-section";
-import { AboutSection } from "@/components/about-section";
-import { BookingSection } from "@/components/booking-section";
-import { HeroSection } from "@/components/hero-section";
-import { ServicesSection } from "@/components/services-section";
-import { Language, siteCopy } from "@/lib/site-copy";
-import { useState } from "react";
+export const metadata: Metadata = {
+  title: "IT поддръжка чрез AnyDesk и на място | neraboti.bg",
+  description:
+    "Бърза IT поддръжка за компютри, офис мрежи, сървъри и киберсигурност. Отдалечена помощ чрез AnyDesk и посещения на място. Запазете час онлайн.",
+  alternates: {
+    canonical: absoluteUrl("/"),
+    languages: getLanguageAlternates("/"),
+  },
+  openGraph: {
+    title: "IT поддръжка чрез AnyDesk и на място | neraboti.bg",
+    description:
+      "Бърза IT поддръжка за компютри, офис мрежи, сървъри и киберсигурност. Отдалечена помощ чрез AnyDesk и посещения на място. Запазете час онлайн.",
+    url: absoluteUrl("/"),
+  },
+};
 
-export default function Home() {
-  const [language, setLanguage] = useState<Language>("BG");
-  const copy = siteCopy[language];
-
-  return (
-    <main className="relative min-h-screen overflow-hidden bg-ink text-slate-100">
-      <div className="noise pointer-events-none fixed inset-0 z-0 opacity-[0.035]" />
-      <HeroSection copy={copy} language={language} onLanguageChange={setLanguage} />
-      <ServicesSection copy={copy.services} />
-      <AnyDeskSection copy={copy.anydesk} />
-      <BookingSection copy={copy.booking} />
-      <AboutSection copy={copy.about} />
-    </main>
-  );
+export default function Page() {
+  return <HomePage />;
 }

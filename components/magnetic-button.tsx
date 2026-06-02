@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 
 type MagneticButtonProps = {
   children: ReactNode;
   href: string;
   variant?: "primary" | "secondary";
   className?: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
 export function MagneticButton({
@@ -15,6 +16,7 @@ export function MagneticButton({
   href,
   variant = "primary",
   className = "",
+  onClick,
 }: MagneticButtonProps) {
   const base =
     "group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg px-6 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950";
@@ -23,6 +25,7 @@ export function MagneticButton({
     return (
       <motion.a
         href={href}
+        onClick={onClick}
         whileHover={{ scale: 1.045, x: 2, y: -2 }}
         whileTap={{ scale: 0.98 }}
         className={`${base} border border-white/12 bg-white/[0.04] text-slate-100 backdrop-blur-xl hover:border-cyan-300/50 hover:bg-cyan-300/[0.08] ${className}`}
@@ -35,6 +38,7 @@ export function MagneticButton({
   return (
     <motion.a
       href={href}
+      onClick={onClick}
       whileHover={{ scale: 1.055, x: 3, y: -3 }}
       whileTap={{ scale: 0.98 }}
       className={`${base} p-[1px] shadow-cyan-glow ${className}`}

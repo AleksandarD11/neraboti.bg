@@ -1,15 +1,18 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export { motion };
 
+export function useAccessibleMotion() {
+  return useReducedMotion();
+}
+
 export const revealUp = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: { duration: 0.78, ease: [0.19, 1, 0.22, 1] },
   },
 };
