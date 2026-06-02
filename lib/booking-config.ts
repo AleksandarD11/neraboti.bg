@@ -15,11 +15,19 @@ export type PreferredContactMethod = (typeof contactMethods)[number]["value"];
 export const pricingVatNote =
   "Забележка: Информацията за ДДС ще бъде уточнена според данните на доставчика на услугата.";
 
+export const indicativePrices = {
+  remoteDiagnostics: "от 15–20 €",
+  remoteSupport: "от 25–35 €/час",
+  onsiteSupport: "от 40–60 €",
+  offer: "по оферта",
+  priceRange: "от 15 €",
+} as const;
+
 export const pricingItems = [
   {
     id: "remote-diagnostics",
     service: "Отдалечена диагностика",
-    price: "от 30-40 лв.",
+    price: indicativePrices.remoteDiagnostics,
     note: "до 30 мин.",
     description:
       "Бърза първоначална проверка на проблема чрез отдалечена връзка. Подходящо за установяване на причината и следващи стъпки.",
@@ -27,7 +35,7 @@ export const pricingItems = [
   {
     id: "remote-support",
     service: "Отдалечена поддръжка",
-    price: "от 50-70 лв./час",
+    price: indicativePrices.remoteSupport,
     note: "чрез AnyDesk",
     description:
       "Помощ при софтуерни проблеми, настройки, имейл, принтери, базова поддръжка и други задачи, които могат да се решат дистанционно.",
@@ -35,7 +43,7 @@ export const pricingItems = [
   {
     id: "onsite-support",
     service: "Посещение на място",
-    price: "от 80-120 лв.",
+    price: indicativePrices.onsiteSupport,
     note: "според район",
     description:
       "Поддръжка на адрес за хардуерни проблеми, офис мрежи, принтери, работни станции и устройства, които изискват физическо присъствие.",
@@ -43,7 +51,7 @@ export const pricingItems = [
   {
     id: "office-subscription",
     service: "Офис абонамент",
-    price: "по оферта",
+    price: indicativePrices.offer,
     note: "месечна поддръжка",
     description:
       "Планирана IT поддръжка за малки бизнеси, офиси и екипи. Включва регулярна помощ, профилактика, консултации и приоритетна реакция според договорените условия.",
@@ -51,7 +59,7 @@ export const pricingItems = [
   {
     id: "security-audit",
     service: "Киберсигурност одит и проверка за уязвимости",
-    price: "по оферта",
+    price: indicativePrices.offer,
     note: "според обхват",
     description:
       "Проверка на публични уеб приложения, сървъри и основни конфигурации за често срещани рискове. Обхватът се уточнява предварително и се работи само с изрично разрешение от клиента.",
@@ -65,7 +73,7 @@ export const bookingServices = [
     description:
       "Бърза диагностика, настройка на софтуер, поправки на ОС и отдалечено съдействие.",
     duration: "30-60 мин.",
-    price: "от 50-70 лв./час",
+    price: indicativePrices.remoteSupport,
     includes:
       "Диагностика и помощ чрез AnyDesk за софтуерни проблеми, настройки, имейл, принтери и базова поддръжка.",
   },
@@ -75,7 +83,7 @@ export const bookingServices = [
     description:
       "Хардуерни ремонти, настройка на офис мрежи, проверки на устройства и диагностика.",
     duration: "60-120 мин.",
-    price: "от 80-120 лв.",
+    price: indicativePrices.onsiteSupport,
     includes:
       "Посещение на адрес за хардуерни проблеми, мрежи, принтери, работни станции и офис устройства.",
   },
@@ -85,7 +93,7 @@ export const bookingServices = [
     description:
       "Поддръжка на сървъри, работни станции, cloud среди, архиви и администриране.",
     duration: "по предварителна оценка",
-    price: "по оферта",
+    price: indicativePrices.offer,
     includes:
       "Поддръжка на сървъри, архиви, мрежова инфраструктура, достъпи и бизнес системи.",
   },
@@ -95,7 +103,7 @@ export const bookingServices = [
     description:
       "Проверка на публични уеб приложения, сървъри и основни конфигурации за често срещани рискове.",
     duration: "по предварителна оценка",
-    price: "по оферта",
+    price: indicativePrices.offer,
     includes:
       "Ясен доклад с приоритети, препоръки и конкретни стъпки за намаляване на риска. Работим само върху активи, за които имате право да възлагате проверка, и не извършваме тестове без писмено разрешение.",
   },
@@ -105,7 +113,7 @@ export const bookingServices = [
     description:
       "Инженерен анализ на работни процеси, рутинни задачи, API интеграции и персонализирани автоматизации.",
     duration: "по предварителна оценка",
-    price: "по оферта",
+    price: indicativePrices.offer,
     includes:
       "Анализ на процеси, идентифициране на повтаряеми задачи и предложение за скриптове, интеграции и автоматизации.",
   },

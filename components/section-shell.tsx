@@ -30,7 +30,7 @@ export function SectionShell({
       animate="visible"
       whileInView="visible"
       viewport={{ once: true, margin: "-50px" }}
-      className="relative z-10 mx-auto w-full max-w-7xl px-5 py-20 sm:px-8 lg:py-28"
+      className="relative z-10 mx-auto w-full max-w-7xl scroll-mt-28 px-5 py-20 sm:px-8 lg:py-28"
     >
       <div className="mx-auto mb-12 max-w-3xl text-center">
         {eyebrow ? (

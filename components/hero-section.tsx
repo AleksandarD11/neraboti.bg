@@ -4,7 +4,8 @@ import type { Language, SiteCopy } from "@/lib/site-copy";
 import { trackEvent } from "@/lib/analytics";
 import { ArrowRight, Menu, X } from "lucide-react";
 import type { MouseEvent, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { MagneticButton } from "./magnetic-button";
 import { motion, staggerContainer } from "./motion";
 
@@ -161,15 +162,23 @@ function HeaderNav({ copy }: { copy: SiteCopy["nav"] }) {
 
 function MobileNav({ copy }: { copy: SiteCopy["nav"] }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const links = [
-    { href: "/uslugi", label: copy.services },
-    { href: "/ceni", label: copy.pricing },
-    { href: "/anydesk-pomosht", label: copy.remote },
-    { href: "/za-nas", label: copy.about },
+    { href: "/#services", label: copy.services },
+    { href: "/#pricing", label: copy.pricing },
+    { href: "/#anydesk-help", label: copy.remote },
+    { href: "/#about", label: copy.about },
     { href: "/kontakti", label: copy.contacts },
-    { href: "/faq", label: copy.faq },
-    { href: "#booking", label: copy.booking, emphasized: true },
+    { href: "/#faq", label: copy.faq },
+    { href: "/#booking", label: copy.booking, emphasized: true },
   ];
+
+  function closeMenu({ restoreFocus = false } = {}) {
+    setOpen(false);
+    if (restoreFocus) {
+      window.setTimeout(() => triggerRef.current?.focus(), 0);
+    }
+  }
 
   useEffect(() => {
     if (!open) {
@@ -178,7 +187,7 @@ function MobileNav({ copy }: { copy: SiteCopy["nav"] }) {
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setOpen(false);
+        closeMenu({ restoreFocus: true });
       }
     }
 
@@ -186,9 +195,23 @@ function MobileNav({ copy }: { copy: SiteCopy["nav"] }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   return (
     <div className="relative md:hidden">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
@@ -198,27 +221,39 @@ function MobileNav({ copy }: { copy: SiteCopy["nav"] }) {
       >
         {open ? <X aria-hidden="true" className="h-5 w-5" /> : <Menu aria-hidden="true" className="h-5 w-5" />}
       </button>
-      {open ? (
+      {open ? createPortal((
         <nav
           id="mobile-main-nav"
           aria-label="Основна навигация"
-          className="absolute right-0 top-14 z-50 w-64 rounded-2xl border border-cyan-300/15 bg-slate-950/96 p-3 shadow-[0_24px_80px_rgba(0,0,0,.45)] backdrop-blur-xl"
+          className="fixed inset-0 z-[1000] min-h-screen overflow-y-auto bg-slate-950/98 px-5 pb-[calc(5.75rem+env(safe-area-inset-bottom))] pt-[calc(1rem+env(safe-area-inset-top))] text-slate-100 shadow-[0_24px_80px_rgba(0,0,0,.45)] supports-[height:100dvh]:min-h-[100dvh]"
+          style={{ backgroundColor: "rgba(2, 6, 23, 0.98)" }}
         >
-          <div className="grid gap-2">
+          <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-4 border-b border-cyan-300/15 pb-4">
+            <InteractiveLogo />
+            <button
+              type="button"
+              onClick={() => closeMenu({ restoreFocus: true })}
+              aria-label="Затвори меню"
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-cyan-300/25 bg-cyan-300/10 text-cyan-50 transition hover:bg-cyan-300/15 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950"
+            >
+              <X aria-hidden="true" className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="mx-auto mt-8 grid w-full max-w-lg gap-3">
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => {
-                  if (link.href === "#booking") {
+                  if (link.emphasized) {
                     trackEvent("cta_click_book", { source: "mobile_nav" });
                   }
-                  setOpen(false);
+                  closeMenu();
                 }}
-                className={`rounded-lg px-4 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 ${
+                className={`flex min-h-14 items-center rounded-lg border px-5 py-4 text-base font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 ${
                   link.emphasized
-                    ? "border border-cyan-300/40 bg-cyan-300/12 text-cyan-50"
-                    : "text-slate-200 hover:bg-white/[0.055] hover:text-cyan-100"
+                    ? "border-cyan-300/50 bg-cyan-300/16 text-cyan-50 shadow-[0_0_28px_rgba(34,211,238,.16)]"
+                    : "border-white/10 bg-white/[0.055] text-slate-100 hover:border-cyan-300/40 hover:bg-cyan-300/[0.08] hover:text-cyan-50"
                 }`}
               >
                 {link.label}
@@ -226,7 +261,7 @@ function MobileNav({ copy }: { copy: SiteCopy["nav"] }) {
             ))}
           </div>
         </nav>
-      ) : null}
+      ), document.body) : null}
     </div>
   );
 }
@@ -296,7 +331,7 @@ export function HeroSection({
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-slate-950/56 px-4 py-3 shadow-[0_18px_80px_rgba(0,0,0,.38),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-2xl">
+      <header className="relative z-[60] mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-slate-950/56 px-4 py-3 shadow-[0_18px_80px_rgba(0,0,0,.38),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-2xl">
         <InteractiveLogo />
         <div className="flex items-center gap-3 lg:gap-5">
           <HeaderNav copy={copy.nav} />

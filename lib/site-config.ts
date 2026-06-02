@@ -1,4 +1,5 @@
 import { businessInfo } from "./business-info";
+import { indicativePrices } from "./booking-config";
 import { servicePages } from "./seo-pages";
 
 const productionBaseUrl = "https://neraboti.bg";
@@ -31,7 +32,7 @@ export const siteConfig = {
     description: businessInfo.description,
     phone: businessInfo.phone,
     email: businessInfo.email,
-    priceRange: "от 30 лв.",
+    priceRange: indicativePrices.priceRange,
     address: {
       streetAddress: businessInfo.address,
       addressLocality: "",
